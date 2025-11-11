@@ -1,43 +1,40 @@
-import 'dart:async';
-import 'package:flame/events.dart';
+import 'dart:math';
 import 'package:flame/game.dart';
+import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'asteroid.dart';
 
-///
-/// The Game!
-/// This is just a simple demo FlameGame to allow us to see how
-/// we can use Overlays to enhance this game and see how we can
-/// control the flow of the game.
-///
-/// Things to note:
-/// - the background color of the game is changed to a ARGB color.
-/// - assets are preloaded into cache.
-/// - the game spawns 10 asteroids that are unmanaged.
-/// - the game uses TapCallbacks to handle tap events. Nothing happens yet.
-///
-
-class OverlayTutorial extends FlameGame with TapCallbacks {
-  final BuildContext context;
-
-  OverlayTutorial(this.context);
-
-  @override
-  Color backgroundColor() => const Color.fromARGB(249, 120, 86, 233);
+class OverlayTutorial extends FlameGame with HasCollisionDetection {
+  bool paused = false;
 
   @override
   Future<void> onLoad() async {
-    await images.loadAll([
-      "asteroid.png",
-    ]);
+    await super.onLoad();
 
-    for (int i = 0; i < 10; i++) {
-      add(Asteroid());
+    // Background color
+    camera.viewport = FixedResolutionViewport(Vector2(800, 600));
+    add(ScreenHitbox());
+
+    // Add some asteroids
+    for (int i = 0; i < 6; i++) {
+      add(Asteroid(
+        position: Vector2(
+          Random().nextDouble() * size.x,
+          Random().nextDouble() * size.y,
+        ),
+        speed: 100 + Random().nextDouble() * 150,
+        rotationSpeed: Random().nextDouble(),
+      ));
     }
   }
 
   @override
-  void onTapUp(TapUpEvent event) {
-    super.onTapUp(event);
+  void update(double dt) {
+    if (!paused) {
+      super.update(dt);
+    }
   }
+
+  @override
+  Color backgroundColor() => const Color.fromARGB(255, 10, 5, 25);
 }
